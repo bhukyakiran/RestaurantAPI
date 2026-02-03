@@ -1,0 +1,5 @@
+module github.com/kiran/NawabiHouse
+
+go 1.25.5
+
+require github.com/lib/pq v1.11.0 // indirect
