@@ -1,26 +1,39 @@
-package connection
+package config
 
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"os"
+
 	_ "github.com/lib/pq"
 )
 
 var DB *sql.DB
 
-func ConnectDB() error {
+func ConnectDB() {
+	host := os.Getenv("DB_HOST")
+	if host == "" {
+		host = "localhost" // default for local dev
+	}
 
-	ConnStr := "host=localhost port=5432 user=kiranbhukya password=Kiran@12345 dbname=nawabihouse sslmode=disable"
+	connStr := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s sslmode=disable",
+		host,
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"),
+	)
 
-	db, err := sql.Open("postgres", ConnStr)
+	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
-	if err := db.Ping(); err != nil {
-		return err
-	}
-	DB = db
-	fmt.Println("connected to the database ")
-	return nil
 
+	if err := db.Ping(); err != nil {
+		log.Fatal(err)
+	}
+
+	DB = db
+	log.Println("✅ Connected to PostgreSQL")
 }
